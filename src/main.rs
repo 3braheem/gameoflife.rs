@@ -45,11 +45,11 @@ impl Cell {
         }
     }
     
-    fn die(&self) {
+    fn die(&mut self) {
         self.state = State::Dead;
     }
 
-    fn to_life(&self) {
+    fn to_life(&mut self) {
         self.state = State::Alive;
     }
 
@@ -79,7 +79,7 @@ impl Cell {
 }
 
 impl Page {
-    fn render(&self, index: usize, cell: &Cell, link: &Scope<Self>) -> Html {
+    fn render(&self, index: usize, cell: &Cell, _link: &Scope<Self>) -> Html {
         let cell_state = match cell.is_living() {
             true => "alive",
             _ => "dead",
@@ -89,7 +89,7 @@ impl Page {
         }
     }
 
-    fn step(&self) {
+    fn step(&mut self) {
         let mut to_die = Vec::new();
         let mut to_live = Vec::new();
         for row in 0..self.cell_cols {
@@ -152,7 +152,7 @@ impl Component for Page {
 
     fn create(ctx: &Context<Self>) -> Self {
         let callback = ctx.link().callback(|_| Msg::Tick);
-        let interval = Interval::new(200, move || callback.emit());
+        let interval = Interval::new(200, move || callback.emit(()));
         let (cell_cols, cell_rows) = (50, 50);
 
         Self {
@@ -203,7 +203,7 @@ impl Component for Page {
                     .map(|(row, cell)| self.render(offset + row, cell, ctx.link()));
                 html! {
                     <div key={col} class="grid-row">
-                        { for cells }
+                        { for cell_grid }
                     </div>
                 }
             });
